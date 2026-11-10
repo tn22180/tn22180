@@ -1,6 +1,6 @@
 """Render the neofetch-style card: dark_mode.svg and light_mode.svg.
 
-Left: assets/ascii-art.txt. Right: a terminal panel of key ....... value rows,
+Left: assets/ascii-art.txt (dark) / ascii-art-light.txt (light). Right: a terminal panel of key ....... value rows,
 every row padded to exactly PANEL_COLS characters so the right edge lines up.
 A row that cannot fit raises instead of silently overflowing.
 
@@ -17,7 +17,7 @@ from pathlib import Path
 from palette import THEMES
 
 ROOT = Path(__file__).resolve().parent.parent
-ART = ROOT / "assets" / "ascii-art.txt"
+ART = {"dark": ROOT / "assets" / "ascii-art.txt", "light": ROOT / "assets" / "ascii-art-light.txt"}
 STATS = ROOT / "cache" / "stats.json"
 
 TITLE = "tony@nguyen"
@@ -209,9 +209,10 @@ text, tspan {{white-space: pre;}}
 
 
 def main() -> None:
-    art = ART.read_text(encoding="utf-8").rstrip("\n").split("\n")
     stats = json.loads(STATS.read_text())
     for theme in THEMES:
+        src = ART[theme] if ART[theme].exists() else ART["dark"]
+        art = src.read_text(encoding="utf-8").rstrip("\n").split("\n")
         out = ROOT / f"{theme}_mode.svg"
         out.write_text(build(theme, art, stats), encoding="utf-8")
         print(f"wrote {out.name} ({out.stat().st_size:,} bytes)")
