@@ -1,0 +1,60 @@
+# Daily refresh of the card numbers and the Pac-Man board.
+#
+# GitLab activity cannot be fetched here (self-hosted, token stays off a public
+# repo): tools/fetch_gitlab.py snapshots it locally into cache/gitlab.json and
+# fetch_stats.py merges whatever snapshot is committed.
+name: Update Profile Card
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "assets/**"
+      - "tools/**"
+      - "cache/gitlab.json"
+      - ".github/workflows/profile-card.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-card
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests
+
+      - name: Fetch GitHub stats
+        env:
+          # STATS_TOKEN (PAT, read:user) adds private contributions; the
+          # built-in token is a bot, so GITHUB_LOGIN pins the profile owner.
+          GITHUB_TOKEN: ${{ secrets.STATS_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_LOGIN: ${{ github.repository_owner }}
+        run: python tools/fetch_stats.py
+
+      - run: python tools/build_card.py
+      - run: python tools/build_pacman.py
+      - run: python tools/build_links.py
+
+      - name: Rebase onto anything pushed meanwhile
+        run: git pull --rebase --autostash origin main
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh profile card stats"
+          branch: main
+          file_pattern: "*.svg cache/*.json"

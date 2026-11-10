@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="330" height="52" viewBox="0 0 330 52"
+     font-family="Menlo,Consolas,'DejaVu Sans Mono','Liberation Mono',monospace">
+<rect x="3" y="1" width="324" height="50" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+<rect x="3" y="48" width="324" height="3" rx="1.5" fill="#0550ae"/>
+<g transform="translate(95.0 15.0)" stroke="#0550ae" stroke-linecap="round"><path d="M3 6h14l-1.2 12H4.2z" fill="none" stroke-width="2" stroke-linejoin="round"/><path d="M7 8V5a3 3 0 0 1 6 0v3" fill="none" stroke-width="2"/></g>
+<text x="127.0" y="30.8" font-size="15px" letter-spacing="1" fill="#24292f">SHOPIFY APPS</text>
+</svg>
